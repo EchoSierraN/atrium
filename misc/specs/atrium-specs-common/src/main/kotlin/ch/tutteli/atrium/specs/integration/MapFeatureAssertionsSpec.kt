@@ -24,14 +24,14 @@ abstract class MapFeatureAssertionsSpec(
     val mapNullable = mapOf("a" to 1, "b" to null, null to 3)
 
     include(object : SubjectLessSpec<Map<String, Int>>(describePrefix,
-        keysFeature.forSubjectLess().adjustName { "$it feature" },
+        keysFeature.forSubjectLess(),
         keys.forSubjectLess { isEmpty() },
-        valuesFeature.forSubjectLess().adjustName { "$it feature" },
+        valuesFeature.forSubjectLess(),
         values.forSubjectLess { isEmpty() },
         getExistingFeature.forSubjectLess("a"),
         getExisting.forSubjectLess("a") { isGreaterThan(1) }
     ) {})
-    include(object : SubjectLessSpec<Map<String?, Int?>>("$describePrefix[nullable Key] ",
+    include(object : SubjectLessSpec<Map<String?, Int?>>("$describePrefix[nullable] ",
         getExistingNullableFeature.forSubjectLess("a"),
         getExistingNullable.forSubjectLess("a") { toBe(null) }
     ) {})
@@ -43,13 +43,13 @@ abstract class MapFeatureAssertionsSpec(
         getExisting.forAssertionCreatorSpec("$toBeDescr: 2", "b") { toBe(2) }
     ) {})
     include(object : AssertionCreatorSpec<Map<String?, Int?>>(
-        "$describePrefix[nullable Element] ", mapNullable,
+        "$describePrefix[nullable] ", mapNullable,
         getExistingNullable.forAssertionCreatorSpec("$toBeDescr: 2", "b") { toBe(null) }
     ) {})
 
-    fun describeFun(vararg funName: String, body: Suite.() -> Unit) =
-        describeFunTemplate(describePrefix, funName, body = body)
-
+    fun describeFun(vararg pairs: SpecPair<*>, body: Suite.() -> Unit) =
+        describeFunTemplate(describePrefix, pairs.map { it.name }.toTypedArray(), body = body)
+    
     val fluent = expect(map)
     val fluentNullable = expect(mapNullable)
 
